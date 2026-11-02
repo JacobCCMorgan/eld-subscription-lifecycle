@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eld-subscription-lifecycle"
+version = "0.1.0"
+description = "Seven years of one-year ELD subscriptions: when customers leave, what the renewal cliff looks like, who to call before the next expiry, and how much hardware next year needs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Jacob Chiang" }]
+dependencies = [
+    "pandas>=2.1",
+    "numpy>=1.26",
+    "pyarrow>=14",
+    "scikit-learn>=1.4",
+    "scipy>=1.11",
+    "lifelines>=0.28",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.4"]
+
+[project.scripts]
+sublife = "sublife.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["ignore::FutureWarning", "ignore::UserWarning"]
+
+[tool.ruff]
+line-length = 200
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B905"]
