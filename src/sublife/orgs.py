@@ -22,6 +22,7 @@ import pandas as pd
 from .data import CURRENT_TYPE, GRACE_DAYS, LEGACY_TYPES, SNAPSHOT, TERM_DAYS
 
 RENEW_MARGIN_DAYS = 180  # coverage must run this far past an anniversary to count as renewed there
+DECISION_LEAD_DAYS = 60  # the renewal desk looks at an account this many days before its anniversary
 START_WINDOW_DAYS = 30  # slots sold within this many days of the first one form the "fleet at start"
 
 
@@ -123,15 +124,22 @@ def org_periods(o: pd.DataFrame, c: pd.DataFrame, snapshot: pd.Timestamp = SNAPS
     if p.empty:
         return p
     p["calendar_year"] = p["anniversary"].dt.year
-    # slots alive at the anniversary and replacements in the preceding term
-    slot = c[["org_key", "slot_start", "row_end", "eld_type"]].copy()
+    p["decision_date"] = p["anniversary"] - pd.Timedelta(DECISION_LEAD_DAYS, "D")
+    # slots alive at the anniversary (lifecycle view) and at the decision point (what a renewal desk could see)
+    slot = c[["org_key", "slot_start", "row_end", "eld_type", "return_date"]].copy()
     alive = p.merge(slot, on="org_key", how="left")
     alive["alive"] = (alive["slot_start"] <= alive["anniversary"]) & (alive["row_end"].fillna(snapshot) >= alive["anniversary"] - pd.Timedelta(GRACE_DAYS, "D"))
-    fleet = alive.groupby(["org_key", "k"])["alive"].sum().rename("fleet_at_k")
+    alive["alive_dec"] = (alive["slot_start"] <= alive["decision_date"]) & (alive["row_end"].fillna(snapshot) >= alive["decision_date"])
+    alive["returned_in_term"] = (alive["return_date"] > alive["anniversary"] - pd.Timedelta(TERM_DAYS, "D")) & (alive["return_date"] <= alive["decision_date"])
+    agg = alive.groupby(["org_key", "k"]).agg(fleet_at_k=("alive", "sum"), fleet_at_decision=("alive_dec", "sum"), returned_in_term=("returned_in_term", "any"))
     gen = alive[alive["alive"]].groupby(["org_key", "k"])["eld_type"].agg(_mode).rename("generation_at_k")
-    p = p.merge(fleet, on=["org_key", "k"], how="left").merge(gen, on=["org_key", "k"], how="left")
+    p = p.merge(agg, on=["org_key", "k"], how="left").merge(gen, on=["org_key", "k"], how="left")
+    p["fleet_at_decision"] = p["fleet_at_decision"].fillna(0).astype(int)
+    p["returned_in_term"] = p["returned_in_term"].fillna(False).astype(bool)
+    p["at_risk_at_decision"] = p["fleet_at_decision"] > 0
     p["generation_at_k"] = p["generation_at_k"].fillna("unknown")
     p["fleet_at_k"] = p["fleet_at_k"].fillna(0).astype(int)
+    p["fleet_shrank_by_decision"] = p["fleet_at_decision"] < p.merge(o[["org_key", "fleet_at_start"]], on="org_key", how="left")["fleet_at_start"].values
     static = o[["org_key", "start_year", "fleet_at_start", "fleet_band", "first_generation", "state_group", "channel", "has_dot", "email_is_free_domain"]]
     p = p.merge(static, on="org_key", how="left")
     p["churn"] = 1 - p["renewed"]
@@ -178,6 +186,8 @@ def restore_purged_orgs(snapshot_2024: pd.DataFrame, o: pd.DataFrame, dim_org: p
         "first_make": s[s["at_start"]].groupby("org_key")["make"].agg(_mode),
         "first_model_year": s[s["at_start"]].groupby("org_key")["model_year"].median(),
     })
+    # a handful of 2024 rows carry no expiration; those customers were at least active on the export date
+    r["coverage_end"] = r["coverage_end"].fillna(pd.Timestamp("2024-01-05"))
     r["start_year"] = r["start_date"].dt.year
     r["start_month"] = r["start_date"].dt.month
     r["churned"] = 1
