@@ -137,6 +137,7 @@ def org_periods(o: pd.DataFrame, c: pd.DataFrame, snapshot: pd.Timestamp = SNAPS
     p["fleet_at_decision"] = p["fleet_at_decision"].fillna(0).astype(int)
     p["returned_in_term"] = p["returned_in_term"].fillna(False).astype(bool)
     p["at_risk_at_decision"] = p["fleet_at_decision"] > 0
+    p["fleet_at_decision_band"] = pd.cut(p["fleet_at_decision"], [-1, 0, 1, 2, 5, np.inf], labels=["0", "1", "2", "3-5", "6+"]).astype(str)
     p["generation_at_k"] = p["generation_at_k"].fillna("unknown")
     p["fleet_at_k"] = p["fleet_at_k"].fillna(0).astype(int)
     p["fleet_shrank_by_decision"] = p["fleet_at_decision"] < p.merge(o[["org_key", "fleet_at_start"]], on="org_key", how="left")["fleet_at_start"].values
