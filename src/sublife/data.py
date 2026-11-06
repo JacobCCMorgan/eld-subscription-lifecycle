@@ -54,7 +54,8 @@ def clean_contracts(raw: pd.DataFrame, snapshot: pd.Timestamp = SNAPSHOT) -> pd.
     early_return = c["status"].eq("deleted") & c["return_date"].notna() & (c["return_date"] < c["expiration_date"].fillna(pd.Timestamp.max))
     c["row_end"] = np.where(early_return, c["return_date"], c["expiration_date"])
     c["row_end"] = pd.to_datetime(c["row_end"])
-    c["is_active_now"] = c["status"].eq("active") & (c["expiration_date"] >= snapshot - pd.Timedelta(GRACE_DAYS, "D"))
+    # an active row whose expiration was a placeholder (now null) is still an active subscription
+    c["is_active_now"] = c["status"].eq("active") & (c["expiration_date"].isna() | (c["expiration_date"] >= snapshot - pd.Timedelta(GRACE_DAYS, "D")))
     c["is_billing_hold"] = c["status"].isin(["inactive", "unpaid", "suspended"]) & (c["expiration_date"] >= snapshot)
     return c
 
