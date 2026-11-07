@@ -173,8 +173,8 @@ def risk_list(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Ti
     out = a[["org_key", "next_expiration", "start_date", "active_slots", "legacy_slots_active", "billing_hold_slots", "n_returns", "state_group", "channel"]].copy()
     out["anniversary_k"] = k.values
     out["returned_device_last_12m"] = q["returned_in_term"].values
-    out["p_churn"] = q["p_churn"].values
-    out["expected_churn_slots"] = out["p_churn"] * out["active_slots"]
+    out["p_churn"] = q["p_churn"].values.round(4)
+    out["expected_churn_slots"] = (out["p_churn"] * out["active_slots"]).round(4)
     out = out.sort_values(["p_churn", "active_slots"], ascending=False).reset_index(drop=True)
     out.insert(0, "rank", np.arange(1, len(out) + 1))
     edges = np.quantile(out["p_churn"], [0.5, 0.8]) if len(out) else [0, 0]
