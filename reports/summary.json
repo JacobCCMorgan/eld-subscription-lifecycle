@@ -1,0 +1,250 @@
+{
+  "snapshot_date": "2026-09-28",
+  "contract_rows": 13753,
+  "organizations": 4836,
+  "restored_from_2024": 148,
+  "snapshot_2024_rows": 4977,
+  "call_rows": 9509,
+  "calls_made": 3602,
+  "gap_whole_years": 0.9273504273504274,
+  "risk_horizon_end": "2026-11-27",
+  "validation": {
+    "orgs_active_2024_01_05": 2968,
+    "present_in_2026_table": 0.9383423180592992,
+    "purged_from_2026_table": 183,
+    "reconstructed_as_covered_on_2024_01_05": 0.9547576301615799,
+    "start_date_within_31_days_of_2024_export": 0.8865350089766607
+  },
+  "device_validation": {
+    "devices_in_2024_export": 4052,
+    "devices_found_in_2026_table": 2072,
+    "activation_unchanged": 0.3267374517374517,
+    "activation_moved_one_year": 0.4000965250965251,
+    "activation_moved_two_years": 0.00916988416988417,
+    "activation_moved_other": 0.263996138996139,
+    "contract_date_unchanged": 0.777027027027027
+  },
+  "k_rates_2024_2026": {
+    "1": 0.22893569844789358,
+    "2": 0.2998246639392168,
+    "3": 0.27977667493796526,
+    "4": 0.2878903274942879,
+    "5": 0.25766871165644173,
+    "6": 0.2525597269624573,
+    "7": 0.17073170731707318,
+    "8": 0.0
+  },
+  "churn_by_year": {
+    "2019": 0.1111111111111111,
+    "2020": 0.030434782608695653,
+    "2021": 0.011673151750972763,
+    "2022": 0.07754010695187166,
+    "2023": 0.17149478563151796,
+    "2024": 0.2275489534098582,
+    "2025": 0.3013513513513513,
+    "2026": 0.28708133971291866
+  },
+  "cox": {
+    "n": 2231,
+    "events": 880,
+    "concordance": 0.5494661183217627,
+    "ph_test_min_p": 0.003858600837580777,
+    "cohorts": "2023+"
+  },
+  "hazard_odds": {
+    "k_2": 1.455,
+    "k_3": 1.367,
+    "k_4": 1.377,
+    "k_5": 1.14,
+    "year_2024": 1.094,
+    "year_2025": 2.082,
+    "year_2026": 1.442,
+    "log_fleet_at_decision": 0.337,
+    "fleet_shrank_by_decision": 1.114,
+    "returned_in_term": 2.311,
+    "outside_ca": 0.962,
+    "channel_other_rep": 1.193,
+    "channel_unknown": 0.871,
+    "free_email_domain": 0.687
+  },
+  "model_metrics": {
+    "base_rate": {
+      "roc_auc": 0.5,
+      "pr_auc": 0.193,
+      "brier": 0.16,
+      "recall_top20": 0.211
+    },
+    "logistic_signing_only": {
+      "roc_auc": 0.553,
+      "pr_auc": 0.235,
+      "brier": 0.159,
+      "recall_top20": 0.276
+    },
+    "logistic_signing_plus_decision": {
+      "roc_auc": 0.594,
+      "pr_auc": 0.266,
+      "brier": 0.157,
+      "recall_top20": 0.301
+    },
+    "boosting_signing_plus_decision": {
+      "roc_auc": 0.583,
+      "pr_auc": 0.247,
+      "brier": 0.16,
+      "recall_top20": 0.252
+    }
+  },
+  "hazard_holdout_2026": {
+    "n": 1501,
+    "churners": 323,
+    "base_rate": 0.21518987341772153,
+    "roc_auc": 0.5841958086067061,
+    "pr_auc": 0.27554735787046025,
+    "brier": 0.17217770184399617,
+    "recall_top10": 0.13003095975232198,
+    "precision_top10": 0.28,
+    "recall_top20": 0.21671826625386997,
+    "precision_top20": 0.23333333333333334,
+    "recall_top30": 0.34365325077399383,
+    "precision_top30": 0.24666666666666667,
+    "roc_auc_lo": 0.551515828982442,
+    "roc_auc_hi": 0.6212843069481074,
+    "train_years": "(2023, 2024, 2025)",
+    "test_year": 2026,
+    "predicted_mean": 0.284016800205483
+  },
+  "risk_list": {
+    "customers": 408,
+    "slots": 1075,
+    "expected_churn_slots": 149.66430939725535
+  },
+  "renewal_calendar_12m": {
+    "slots_due": 3663.0,
+    "customers_due": 2928.0,
+    "expected_non_renewals_recent": 640.945933391867,
+    "expected_non_renewals_peak": 842.8885144162692
+  },
+  "signings": {
+    "method": "drift_24",
+    "next_12m": 561.0,
+    "lo": 412.2,
+    "hi": 709.3000000000001
+  },
+  "generation_mix_2026": {
+    "unknown": 0.0,
+    "rtps47": 0.0,
+    "rtel47": 0.002,
+    "rtoa47": 0.0,
+    "rtsa12": 0.0,
+    "rtha55": 0.901,
+    "rtps12": 0.097
+  },
+  "transitions": {
+    "replacement_rows": 6229,
+    "previous_generation_known": 0.22250762562209023,
+    "both_known": 1360,
+    "same_generation_share_of_known": 0.5455882352941176,
+    "to_current_share_of_known": 0.27794117647058825
+  },
+  "calls": {
+    "funnel": [
+      {
+        "round": 1,
+        "campaign_phase": "2025 outreach",
+        "listed_rows": 2445,
+        "listed_customers": 2330,
+        "contacted_rows": 498,
+        "reached_rows": 357,
+        "reach_rate_of_contacted": 0.7168674698795181,
+        "agreed_rows": 188,
+        "already_migrated_rows": 129,
+        "cancel_or_closed_rows": 31
+      },
+      {
+        "round": 2,
+        "campaign_phase": "2025 outreach",
+        "listed_rows": 1213,
+        "listed_customers": 1212,
+        "contacted_rows": 1184,
+        "reached_rows": 87,
+        "reach_rate_of_contacted": 0.07347972972972973,
+        "agreed_rows": 73,
+        "already_migrated_rows": 5,
+        "cancel_or_closed_rows": 7
+      },
+      {
+        "round": 3,
+        "campaign_phase": "2025 outreach",
+        "listed_rows": 1131,
+        "listed_customers": 1129,
+        "contacted_rows": 921,
+        "reached_rows": 292,
+        "reach_rate_of_contacted": 0.31704668838219324,
+        "agreed_rows": 201,
+        "already_migrated_rows": 59,
+        "cancel_or_closed_rows": 22
+      },
+      {
+        "round": 4,
+        "campaign_phase": "2026-09 outreach",
+        "listed_rows": 3839,
+        "listed_customers": 2126,
+        "contacted_rows": 428,
+        "reached_rows": 221,
+        "reach_rate_of_contacted": 0.5163551401869159,
+        "agreed_rows": 100,
+        "already_migrated_rows": 66,
+        "cancel_or_closed_rows": 35
+      },
+      {
+        "round": 5,
+        "campaign_phase": "2026-09 outreach",
+        "listed_rows": 881,
+        "listed_customers": 575,
+        "contacted_rows": 571,
+        "reached_rows": 385,
+        "reach_rate_of_contacted": 0.6742556917688266,
+        "agreed_rows": 200,
+        "already_migrated_rows": 86,
+        "cancel_or_closed_rows": 72
+      }
+    ],
+    "outcomes_2025": [
+      {
+        "result_in_2025": "no answer (text sent)",
+        "customers": 866,
+        "migrated_share": 0.704,
+        "left_share": 0.106
+      },
+      {
+        "result_in_2025": "listed, never contacted",
+        "customers": 862,
+        "migrated_share": 0.537,
+        "left_share": 0.426
+      },
+      {
+        "result_in_2025": "agreed to exchange",
+        "customers": 443,
+        "migrated_share": 0.88,
+        "left_share": 0.043
+      },
+      {
+        "result_in_2025": "already migrated",
+        "customers": 175,
+        "migrated_share": 0.954,
+        "left_share": 0.034
+      },
+      {
+        "result_in_2025": "cancel / closed / on hold",
+        "customers": 52,
+        "migrated_share": 0.019,
+        "left_share": 0.731
+      },
+      {
+        "result_in_2025": "other",
+        "customers": 14,
+        "migrated_share": 0.714,
+        "left_share": 0.143
+      }
+    ]
+  }
+}
