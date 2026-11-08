@@ -74,7 +74,7 @@ def main(argv=None):
     # 2. survival
     km_all = survival.km_table(o)
     km_seg = pd.concat([survival.km_table(o, by) for by in ["start_year", "fleet_band", "state_group", "channel", "email_is_free_domain"]], ignore_index=True)
-    pd.concat([km_all, km_seg]).to_csv(tab / "km_survival.csv", index=False)
+    _csv(pd.concat([km_all, km_seg]), tab / "km_survival.csv")
     hr, cox_meta = survival.cox_model(o)
     _csv(hr, tab / "cox_hazard_ratios.csv")
     by_year = survival.hazard_by_year(p)
