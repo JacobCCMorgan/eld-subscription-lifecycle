@@ -34,9 +34,9 @@ January 2024 is used to validate the reconstruction. Inputs are de-identified an
 - **Fleet size at renewal time is the strongest attribute.** Accounts running one vehicle 60 days before
   the anniversary fail to renew 25 % of the time; two vehicles 14 %, three to five 13 %, six or more 8 %.
   Fleet size at signing separates much less (22 % vs 15 % for one- vs two-vehicle starts).
-- **43 % of churned customers return the device(s) mid-term**, at a median of day 215 of the 365-day term;
+- **43 % of churned customers return the device(s) mid-term**, at a median of day 214 of the 365-day term;
   52 % let the term expire. 31 % of first-year churn is already done before the 60-day decision point. A
-  return during the current term multiplies the odds of non-renewal by 2.3 (2.0-2.8): it is the one
+  return during the current term multiplies the odds of non-renewal by 2.3 (1.9-2.8): it is the one
   early-warning signal the CRM already holds.
 - **The renewal desk gets a modest ranking, not a forecast.** On a time-ordered holdout (2024 signings,
   638 customers, 19 % non-renewal) the best model reaches ROC-AUC 0.59 (0.54-0.65); calling the top 20 % of
@@ -45,11 +45,11 @@ January 2024 is used to validate the reconstruction. Inputs are de-identified an
   attribute. Attributes at signing alone: Cox concordance 0.55.
 - **Next 60 days and next 12 months.** 408 customers with 1,075 subscriptions reach an anniversary by
   27 Nov 2026 (`reports/renewal_risk_list.csv`, ranked, about 150 expected non-renewals). 3,663 subscriptions
-  from 2,928 customers come up in the twelve months after the export: 642 expected non-renewals at the
-  recent-year rate, 843 at the 2025 peak rate, with a July peak of 395 expiring terms. New signings run at
+  from 2,928 customers come up in the twelve months after the export: 640 expected non-renewals at the
+  recent-year rate, 842 at the 2025 peak rate, with a July peak of 395 expiring terms. New signings run at
   33 per month; the backtested methods put the next twelve months between about 400 and 560.
 - **The hardware migration is nearly done and the calls were predictive.** 90 % of active subscriptions are
-  on the 2.0 unit; 365 legacy units at 251 customers remain. Five call rounds: round 2 (1,184 calls) reached
+  on the 2.0 unit; 366 legacy units at 252 customers remain. Five call rounds: round 2 (1,184 calls) reached
   a person on 7 % of calls, and repeated attempts did not raise reach (28 %, 29 %, 23 %). Of customers who
   agreed to exchange in 2025, 88 % are on the new unit and 4 % have left; of those who said cancel / closed /
   on hold, 73 % have left; 43 % of customers listed but never called are gone, so the lists carried accounts
