@@ -26,6 +26,11 @@ def _json_default(o):
     return str(o)
 
 
+def _csv(df: pd.DataFrame, path: Path):
+    """Published tables carry six decimals, not float noise."""
+    df.round(6).to_csv(path, index=False)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Subscription lifecycle analysis.")
     ap.add_argument("--input", type=Path, default=Path("data/input"))
@@ -48,27 +53,27 @@ def main(argv=None):
     dev = validate.device_level(c, snap)
     vsum, realized = validate.org_level(o, snap)
     cov = validate.cohort_coverage(o, snap)
-    realized.to_csv(tab / "validation_realized_2024_outcomes.csv", index=False)
-    cov.to_csv(tab / "validation_cohort_coverage.csv", index=False)
+    _csv(realized, tab / "validation_realized_2024_outcomes.csv")
+    _csv(cov, tab / "validation_cohort_coverage.csv")
 
     # 2. survival
     km_all = survival.km_table(o)
     km_seg = pd.concat([survival.km_table(o, by) for by in ["start_year", "fleet_band", "state_group", "channel", "email_is_free_domain"]], ignore_index=True)
     pd.concat([km_all, km_seg]).to_csv(tab / "km_survival.csv", index=False)
     hr, cox_meta = survival.cox_model(o)
-    hr.to_csv(tab / "cox_hazard_ratios.csv", index=False)
+    _csv(hr, tab / "cox_hazard_ratios.csv")
     by_year = survival.hazard_by_year(p)
     by_k = survival.hazard_by_k(p)
     by_k24 = survival.hazard_by_k(p, year_min=2024)
-    by_year.to_csv(tab / "churn_by_calendar_year.csv", index=False)
-    by_k.to_csv(tab / "churn_by_anniversary.csv", index=False)
+    _csv(by_year, tab / "churn_by_calendar_year.csv")
+    _csv(by_k, tab / "churn_by_anniversary.csv")
     k_rates = by_k24[by_k24["calendar_year"] == "all"].set_index("k")["churn_rate"].to_dict()
     odds = rm.hazard_bootstrap_odds(p, n_boot=a.bootstrap)
-    odds.to_csv(tab / "hazard_odds_ratios.csv", index=False)
+    _csv(odds, tab / "hazard_odds_ratios.csv")
 
     # 3. who leaves and how
     exit_t = analysis.exit_mode_table(o)
-    exit_t.to_csv(tab / "exit_mode.csv", index=False)
+    _csv(exit_t, tab / "exit_mode.csv")
     atrisk = p[(p["calendar_year"] >= 2023) & p["at_risk_at_decision"]]
     seg_rows = []
     for by in ["fleet_at_decision_band", "fleet_band", "state_group", "channel", "email_is_free_domain", "k", "start_year"]:
@@ -77,49 +82,49 @@ def main(argv=None):
         t["value"] = t["value"].astype(str)
         seg_rows.append(t)
     segments = pd.concat(seg_rows, ignore_index=True)
-    segments.to_csv(tab / "churn_at_decision_point_by_segment.csv", index=False)
+    _csv(segments, tab / "churn_at_decision_point_by_segment.csv")
     first_all = p[(p["k"] == 1) & (p["calendar_year"] >= 2023)]
     midterm_share = float(1 - first_all.loc[first_all["churn"] == 1, "at_risk_at_decision"].mean())
 
     # 4. models
     x = rm.first_anniversary_frame(p, o)
     met, cal, imp = rm.first_anniversary_models(x)
-    met.to_csv(tab / "model_metrics_first_anniversary.csv", index=False)
-    cal.to_csv(tab / "model_calibration_first_anniversary.csv", index=False)
-    imp.to_csv(tab / "model_features_first_anniversary.csv", index=False)
+    _csv(met, tab / "model_metrics_first_anniversary.csv")
+    _csv(cal, tab / "model_calibration_first_anniversary.csv")
+    _csv(imp, tab / "model_features_first_anniversary.csv")
     hold, hold_cal = rm.hazard_temporal_holdout(p)
-    hold_cal.to_csv(tab / "hazard_holdout_2026_calibration.csv", index=False)
+    _csv(hold_cal, tab / "hazard_holdout_2026_calibration.csv")
     rl = rm.risk_list(o, c, p, SNAPSHOT)
-    rl.to_csv(out / "renewal_risk_list.csv", index=False)
+    _csv(rl, out / "renewal_risk_list.csv")
 
     # 5. demand
     rcal = demand.renewal_calendar(o, c, p, SNAPSHOT)
-    rcal.to_csv(tab / "renewal_calendar_12m.csv", index=False)
+    _csv(rcal, tab / "renewal_calendar_12m.csv")
     sign = demand.signings_per_month(o, end=SNAPSHOT.to_period("M").to_timestamp())
     bt = demand.backtest(sign)
     fc, best = demand.forecast(sign, bt)
     flat_12m = float(demand.METHODS["mean_last_12"](sign["new_customers"].to_numpy(dtype=float), 12).sum())
-    sign.to_csv(tab / "signings_per_month.csv", index=False)
-    bt.to_csv(tab / "signings_backtest.csv", index=False)
-    fc.to_csv(tab / "signings_forecast_12m.csv", index=False)
+    _csv(sign, tab / "signings_per_month.csv")
+    _csv(bt, tab / "signings_backtest.csv")
+    _csv(fc, tab / "signings_forecast_12m.csv")
 
     # 6. hardware and calls
     mix = lineage.generation_mix(c, snap, inp["dim_device"])
     trans, tmeta = lineage.transitions(c, inp["dim_device"])
     pend = lineage.pending_migration(c, o)
     rets = lineage.returns_per_month(c, o)
-    mix.to_csv(tab / "generation_mix.csv", index=False)
-    trans.to_csv(tab / "generation_transitions.csv", index=False)
-    pend.to_csv(tab / "pending_migration.csv", index=False)
-    rets.to_csv(tab / "device_returns_per_month.csv", index=False)
+    _csv(mix, tab / "generation_mix.csv")
+    _csv(trans, tab / "generation_transitions.csv")
+    _csv(pend, tab / "pending_migration.csv")
+    _csv(rets, tab / "device_returns_per_month.csv")
     fun = calls.funnel(inp["migration_calls"])
     mixr = calls.result_mix(inp["migration_calls"])
     outc = calls.outcomes_2025_rounds(inp["migration_calls"], o)
     rep = calls.repeat_contacts(inp["migration_calls"])
-    fun.to_csv(tab / "calls_funnel.csv", index=False)
-    mixr.to_csv(tab / "calls_result_mix.csv", index=False)
-    outc.to_csv(tab / "calls_outcomes_2025_rounds.csv", index=False)
-    rep.to_csv(tab / "calls_reach_by_attempt.csv", index=False)
+    _csv(fun, tab / "calls_funnel.csv")
+    _csv(mixr, tab / "calls_result_mix.csv")
+    _csv(outc, tab / "calls_outcomes_2025_rounds.csv")
+    _csv(rep, tab / "calls_reach_by_attempt.csv")
 
     # figures
     report.fig_hazard(by_year, by_k, realized, fig)
