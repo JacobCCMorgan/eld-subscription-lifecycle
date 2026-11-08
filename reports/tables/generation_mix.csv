@@ -1,8 +1,8 @@
 generation,active_2024_01,active_2026_09,share_2024_01,share_2026_09,is_legacy
 unknown,3129,1,0.628692,0.000271,False
-rtps47,1766,0,0.354832,0.0,True
+rtps47,1766,0,0.354832,0,True
 rtel47,44,7,0.008841,0.001894,True
-rtoa47,36,0,0.007233,0.0,True
-rtsa12,2,0,0.000402,0.0,True
-rtha55,0,3328,0.0,0.900677,False
-rtps12,0,359,0.0,0.097158,True
+rtoa47,36,0,0.007233,0,True
+rtsa12,2,0,0.000402,0,True
+rtha55,0,3328,0,0.900677,False
+rtps12,0,359,0,0.097158,True

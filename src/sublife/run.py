@@ -17,8 +17,8 @@ from .orgs import org_periods, org_table_with_restored
 def _json_default(o):
     if isinstance(o, (np.integer,)):
         return int(o)
-    if isinstance(o, (np.floating,)):
-        return None if np.isnan(o) else float(o)
+    if isinstance(o, (np.floating, float)):
+        return None if np.isnan(o) else round(float(o), 6)
     if isinstance(o, (np.bool_,)):
         return bool(o)
     if isinstance(o, (pd.Timestamp,)):
@@ -28,7 +28,7 @@ def _json_default(o):
 
 def _csv(df: pd.DataFrame, path: Path):
     """Published tables carry six decimals, not float noise."""
-    df.round(6).to_csv(path, index=False)
+    df.round(6).to_csv(path, index=False, float_format="%.6g")
 
 
 def main(argv=None):
