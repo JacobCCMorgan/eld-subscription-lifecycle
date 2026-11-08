@@ -115,7 +115,7 @@
   "risk_list": {
     "customers": 408,
     "slots": 1075,
-    "expected_churn_slots": 149.66430939725535
+    "expected_churn_slots": 149.6683
   },
   "renewal_calendar_12m": {
     "slots_due": 3663.0,
