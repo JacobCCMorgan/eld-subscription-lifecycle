@@ -135,6 +135,7 @@ def build_calls(path: Path, p: Pseudonymizer) -> pd.DataFrame:
     d["call_date"] = pd.NaT
     d["campaign_phase"] = "2025 outreach"
     d["date_known"] = False
+    # in this sheet "Status" holds the staff account listed against the customer, not the caller
     d["staff_key"] = p.series(r1["Status"], "staff", "STF-", normalize=lambda v: str(v).strip().lower())
     d["sales_rep_key"] = p.series(r1["Sales"], "sales", "REP-", normalize=lambda v: str(v).strip().lower())
     d["eld_type_at_call"] = None

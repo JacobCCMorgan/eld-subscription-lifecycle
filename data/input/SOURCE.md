@@ -36,6 +36,9 @@ analysis code reconstructs renewal histories from these semantics; see `src/subl
 - Call results were reduced to a fixed set of English category codes; the operators' notes are not
   included. Rounds 1-3 have no per-call date in the source (only that the campaign text was sent on 25 June
   of the 2025 outreach); `date_known` is false for those rows.
+- `staff_key` in the round-1 rows is the staff account listed against the customer in that sheet, not the
+  person who made the call; round 1 marks the caller only on the rows that were texted, which is kept as
+  `text_sent`. In rounds 2-5 `staff_key` is the staff member recorded on the row.
 - `is_internal_test` marks the vendor's internal test organizations; the analysis excludes them.
 - Counts below 5 in published aggregate tables are reported as "<5".
 
