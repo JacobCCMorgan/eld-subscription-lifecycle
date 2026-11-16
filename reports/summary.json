@@ -213,37 +213,43 @@
         "result_in_2025": "no answer (text sent)",
         "customers": 866,
         "migrated_share": 0.704,
-        "left_share": 0.106
+        "left_share": 0.058,
+        "on_hold_share": 0.048
       },
       {
         "result_in_2025": "listed, never contacted",
         "customers": 862,
         "migrated_share": 0.537,
-        "left_share": 0.426
+        "left_share": 0.28,
+        "on_hold_share": 0.146
       },
       {
         "result_in_2025": "agreed to exchange",
         "customers": 443,
         "migrated_share": 0.88,
-        "left_share": 0.043
+        "left_share": 0.018,
+        "on_hold_share": 0.025
       },
       {
         "result_in_2025": "already migrated",
         "customers": 175,
         "migrated_share": 0.954,
-        "left_share": 0.034
+        "left_share": 0.017,
+        "on_hold_share": 0.017
       },
       {
         "result_in_2025": "cancel / closed / on hold",
         "customers": 52,
         "migrated_share": 0.019,
-        "left_share": 0.731
+        "left_share": 0.615,
+        "on_hold_share": 0.115
       },
       {
         "result_in_2025": "other",
         "customers": 14,
         "migrated_share": 0.714,
-        "left_share": 0.143
+        "left_share": 0.143,
+        "on_hold_share": 0.0
       }
     ]
   }

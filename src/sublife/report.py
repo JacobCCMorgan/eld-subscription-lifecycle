@@ -195,7 +195,7 @@ def fig_migration(mix: pd.DataFrame, fun: pd.DataFrame, outc: pd.DataFrame, out:
     order = [g for g in ["agreed to exchange", "already migrated", "no answer (text sent)", "listed, never contacted", "cancel / closed / on hold"] if g in o.index]
     y = np.arange(len(order))
     ax[2].barh(y - 0.2, [o.loc[g, "migrated_share"] for g in order], height=0.4, color=C["green"], label="migrated by Sep 2026")
-    ax[2].barh(y + 0.2, [o.loc[g, "left_share"] for g in order], height=0.4, color=C["red"], label="no longer a customer")
+    ax[2].barh(y + 0.2, [o.loc[g, "left_share"] for g in order], height=0.4, color=C["red"], label="left by Sep 2026")
     ax[2].set_yticks(y)
     ax[2].set_yticklabels([f"{g}\n(n={int(o.loc[g, 'customers'])})" for g in order], fontsize=8)
     ax[2].invert_yaxis()
@@ -302,7 +302,7 @@ def write_report(path: Path, ctx: dict):
                  f"Across the 2025 rounds the reach rate did not improve with repeated attempts ({', '.join(pct(v) for v in ctx['reach_by_attempt'])} on the first, second and third attempt).")
     lines.append(f"- What customers said in 2025 predicts where they are in September 2026: of those who **agreed to exchange**, {pct(outc.loc['agreed to exchange', 'migrated_share'])} are on the new unit and {pct(outc.loc['agreed to exchange', 'left_share'])} have left; "
                  f"of those who **did not answer** (text sent), {pct(outc.loc['no answer (text sent)', 'migrated_share'])} migrated and {pct(outc.loc['no answer (text sent)', 'left_share'])} left; "
-                 f"of those who said **cancel / closed / on hold**, {pct(outc.loc['cancel / closed / on hold', 'left_share'])} have left. Customers listed but never called were the worst group ({pct(outc.loc['listed, never contacted', 'left_share'])} gone), which says the lists included accounts that were already on their way out.")
+                 f"of those who said **cancel / closed / on hold**, {pct(outc.loc['cancel / closed / on hold', 'left_share'])} have left. Customers listed but never called were the worst group: {pct(outc.loc['listed, never contacted', 'left_share'])} have left and another {pct(outc.loc['listed, never contacted', 'on_hold_share'])} are on hold or in grace, which says the lists included accounts that were already on their way out.")
     lines.append(f"- List hygiene: {int(fun.loc[4, 'already_migrated_rows']) + int(fun.loc[5, 'already_migrated_rows'])} of the {int(fun.loc[4, 'contacted_rows']) + int(fun.loc[5, 'contacted_rows'])} September-2026 calls went to customers who had already swapped the device.\n")
     lines.append("![calls](figures/07_migration_and_calls.png)\n")
 

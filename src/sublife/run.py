@@ -175,7 +175,7 @@ def main(argv=None):
                     "renewal_calendar_12m": rcal[["slots_due", "customers_due", "expected_non_renewals_recent", "expected_non_renewals_peak"]].sum().to_dict(),
                     "signings": {"method": best, "next_12m": float(fc["forecast"].sum()), "lo": float(fc["lo"].sum()), "hi": float(fc["hi"].sum())},
                     "generation_mix_2026": mix.set_index("generation")["share_2026_09"].round(3).to_dict(), "transitions": tmeta,
-                    "calls": {"funnel": fun.to_dict(orient="records"), "outcomes_2025": outc[["result_in_2025", "customers", "migrated_share", "left_share"]].round(3).to_dict(orient="records")}})
+                    "calls": {"funnel": fun.to_dict(orient="records"), "outcomes_2025": outc[["result_in_2025", "customers", "migrated_share", "left_share", "on_hold_share"]].round(3).to_dict(orient="records")}})
     (out / "summary.json").write_text(json.dumps(_round_nested(summary), indent=2, default=_json_default), encoding="utf-8")
     print(json.dumps({"organizations": summary["organizations"], "anniversaries": int(len(p)), "churn_by_year": {k: round(v, 3) for k, v in summary["churn_by_year"].items()}, "risk_list": summary["risk_list"]}, default=_json_default))
 

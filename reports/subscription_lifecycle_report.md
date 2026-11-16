@@ -49,7 +49,7 @@ Data: the vendor's CRM contract list as of 2026-09-28 (13,753 vehicle-subscripti
 ## 6. The migration call campaign
 
 - Five rounds: 498, 1,184, 921, 428 and 571 calls. Round 1 reached a person on 72 % of calls; round 2, the largest, on 7 % - 93 % of its 1,184 calls ended in a text message. Across the 2025 rounds the reach rate did not improve with repeated attempts (28 %, 29 %, 23 % on the first, second and third attempt).
-- What customers said in 2025 predicts where they are in September 2026: of those who **agreed to exchange**, 88 % are on the new unit and 4 % have left; of those who **did not answer** (text sent), 70 % migrated and 11 % left; of those who said **cancel / closed / on hold**, 73 % have left. Customers listed but never called were the worst group (43 % gone), which says the lists included accounts that were already on their way out.
+- What customers said in 2025 predicts where they are in September 2026: of those who **agreed to exchange**, 88 % are on the new unit and 2 % have left; of those who **did not answer** (text sent), 70 % migrated and 6 % left; of those who said **cancel / closed / on hold**, 62 % have left. Customers listed but never called were the worst group: 28 % have left and another 15 % are on hold or in grace, which says the lists included accounts that were already on their way out.
 - List hygiene: 152 of the 999 September-2026 calls went to customers who had already swapped the device.
 
 ![calls](figures/07_migration_and_calls.png)

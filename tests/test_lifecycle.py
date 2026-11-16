@@ -193,3 +193,19 @@ def test_published_tables_are_consistent():
     snap = inp["contracts_snapshot_2024-01-05"]
     assert (snap["snapshot_date"] == T("2024-01-05")).all()
     assert snap["org_key"].isin(inp["dim_org"]["org_key"]).mean() > 0.95
+
+
+@pytestmark_inputs
+def test_call_outcomes_keep_on_hold_apart_from_left():
+    from sublife import calls
+    from sublife.data import clean_contracts, load_inputs
+    from sublife.orgs import org_table_with_restored
+
+    inp = load_inputs(INPUT)
+    o = org_table_with_restored(clean_contracts(inp["fact_contract"]), inp["dim_org"], inp["contracts_snapshot_2024-01-05"])
+    t = calls.outcomes_2025_rounds(inp["migration_calls"], o).set_index("result_in_2025")
+    assert ((t["migrated_share"] + t["left_share"] + t["on_hold_share"]) <= 1 + 1e-9).all()
+    never = t.loc["listed, never contacted"]
+    # a customer with paid term left, or inside the grace period, has not left
+    assert 0.25 < never["left_share"] < 0.31
+    assert 0.12 < never["on_hold_share"] < 0.17

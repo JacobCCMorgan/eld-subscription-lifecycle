@@ -3,7 +3,8 @@
 Five call rounds. Rounds 1-3 ran in 2025 (no per-call date in the source), rounds 4-5 in September 2026,
 two to four weeks before the CRM export, so only the 2025 rounds have a long enough window to look at
 outcomes. Outcome = the customer's state on 28 Sep 2026: migrated (an active 2.0 slot), still on legacy
-hardware, or no longer a customer.
+hardware, left (coverage ended more than the grace period ago), or on hold / in grace (no active slot, but
+paid term left or coverage ended only recently).
 """
 from __future__ import annotations
 
@@ -54,19 +55,22 @@ def outcomes_2025_rounds(calls: pd.DataFrame, o: pd.DataFrame) -> pd.DataFrame:
     best["result_group"] = best["result_group"].fillna("listed, never contacted")
     m = best.merge(o[["org_key", "lifecycle", "has_current_type", "legacy_slots_active", "active_slots"]], on="org_key", how="left")
     m["state_2026_09"] = "not found"
-    m.loc[m["lifecycle"].notna(), "state_2026_09"] = "left"
+    m.loc[m["lifecycle"].notna(), "state_2026_09"] = "on hold or in grace"
+    m.loc[m["lifecycle"].eq("churned"), "state_2026_09"] = "left"
     m.loc[(m["active_slots"] > 0) & (m["legacy_slots_active"] > 0) & ~m["has_current_type"].fillna(False).astype(bool), "state_2026_09"] = "active, still legacy"
     m.loc[(m["active_slots"] > 0) & m["has_current_type"].fillna(False).astype(bool), "state_2026_09"] = "active, migrated"
-    m.loc[(m["active_slots"] > 0) & (m["state_2026_09"] == "left"), "state_2026_09"] = "active, generation unknown"
+    m.loc[(m["active_slots"] > 0) & m["state_2026_09"].isin(["left", "on hold or in grace"]), "state_2026_09"] = "active, generation unknown"
     rows = []
     for grp, g in m.groupby("result_group"):
         n = len(g)
         mig = int((g["state_2026_09"] == "active, migrated").sum())
         left = int((g["state_2026_09"] == "left").sum())
+        hold = int((g["state_2026_09"] == "on hold or in grace").sum())
         pm, lo, hi = wilson(mig, n)
         pl, llo, lhi = wilson(left, n)
         rows.append({"result_in_2025": grp, "customers": n, "migrated_by_2026_09": suppress(mig), "migrated_share": pm, "migrated_lo": lo, "migrated_hi": hi,
                      "left_by_2026_09": suppress(left), "left_share": pl, "left_lo": llo, "left_hi": lhi,
+                     "on_hold_by_2026_09": suppress(hold), "on_hold_share": hold / n,
                      "still_legacy": suppress(int((g["state_2026_09"] == "active, still legacy").sum()))})
     return pd.DataFrame(rows).sort_values("customers", ascending=False).reset_index(drop=True)
 
