@@ -5,6 +5,10 @@ two to four weeks before the CRM export, so only the 2025 rounds have a long eno
 outcomes. Outcome = the customer's state on 28 Sep 2026: migrated (an active 2.0 slot), still on legacy
 hardware, left (coverage ended more than the grace period ago), or on hold / in grace (no active slot, but
 paid term left or coverage ended only recently).
+
+These tables describe the groups; they do not measure what the calls achieved. Nobody was chosen for a call
+at random, the later lists were fresh pulls of customers still using a legacy unit, and closed accounts
+were removed from those sheets afterwards, so a customer's group already reflects where they were heading.
 """
 from __future__ import annotations
 

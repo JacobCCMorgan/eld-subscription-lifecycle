@@ -53,7 +53,8 @@ January 2024 is used to validate the reconstruction. Inputs are de-identified an
   a person on 7 % of calls, and repeated attempts did not raise reach (28 %, 29 %, 23 %). Of customers who
   agreed to exchange in 2025, 88 % are on the new unit and 2 % have left; of those who said cancel / closed /
   on hold, 62 % have left; of customers listed but never called, 28 % have left and another 15 % are on hold
-  or in grace, so the lists carried accounts already on their way out. 152 of the 999 September-2026 calls
+  or in grace, so the lists carried accounts already on their way out. These gaps describe the groups; who
+  was called was not random, so they are not the effect of the calls. 152 of the 999 September-2026 calls
   went to customers who had already swapped.
 
 Full write-up with figures: [`reports/subscription_lifecycle_report.md`](reports/subscription_lifecycle_report.md).
