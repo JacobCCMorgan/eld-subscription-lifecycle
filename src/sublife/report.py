@@ -298,7 +298,8 @@ def write_report(path: Path, ctx: dict):
 
     lines.append("## 6. The migration call campaign\n")
     lines.append(f"- Five rounds: {int(fun.loc[1, 'contacted_rows'])}, {int(fun.loc[2, 'contacted_rows']):,}, {int(fun.loc[3, 'contacted_rows'])}, {int(fun.loc[4, 'contacted_rows'])} and {int(fun.loc[5, 'contacted_rows'])} calls. "
-                 f"Round 1 reached a person on {pct(fun.loc[1, 'reach_rate_of_contacted'])} of calls; round 2, the largest, on {pct(fun.loc[2, 'reach_rate_of_contacted'])} - {pct(ctx['round2_no_answer'])} of its {int(fun.loc[2, 'contacted_rows']):,} calls ended in a text message. "
+                 f"Round 1 shows a person reached on {pct(fun.loc[1, 'reach_rate_of_contacted'])} of its logged calls, but unanswered calls were only written down for the first {ctx['round1_logging']['rows_with_unanswered_calls_logged']} rows of its list "
+                 f"(all {ctx['round1_logging']['calls_logged_below']} calls logged below that point are answered ones); on those rows the rate was {pct(ctx['round1_logging']['reach_rate_on_those_rows'])}. Round 2, the largest, reached a person on {pct(fun.loc[2, 'reach_rate_of_contacted'])} - {pct(ctx['round2_no_answer'])} of its {int(fun.loc[2, 'contacted_rows']):,} calls ended in a text message. "
                  f"Across the 2025 rounds the reach rate did not improve with repeated attempts ({', '.join(pct(v) for v in ctx['reach_by_attempt'])} on the first, second and third attempt).")
     lines.append(f"- What customers said in 2025 predicts where they are in September 2026: of those who **agreed to exchange**, {pct(outc.loc['agreed to exchange', 'migrated_share'])} are on the new unit and {pct(outc.loc['agreed to exchange', 'left_share'])} have left; "
                  f"of those who **did not answer** (text sent), {pct(outc.loc['no answer (text sent)', 'migrated_share'])} migrated and {pct(outc.loc['no answer (text sent)', 'left_share'])} left; "

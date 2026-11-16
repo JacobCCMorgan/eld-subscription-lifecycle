@@ -208,6 +208,13 @@
         "cancel_or_closed_rows": 72
       }
     ],
+    "round1_logging": {
+      "rows_with_unanswered_calls_logged": 472,
+      "calls_on_those_rows": 338,
+      "reach_rate_on_those_rows": 0.58284,
+      "calls_logged_below": 160,
+      "unanswered_logged_below": 0
+    },
     "outcomes_2025": [
       {
         "result_in_2025": "no answer (text sent)",

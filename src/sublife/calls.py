@@ -36,6 +36,22 @@ def funnel(calls: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def round1_logging(calls: pd.DataFrame) -> dict:
+    """Round 1 stopped writing down unanswered calls part-way down its list.
+
+    Below the last unanswered call on record every logged call is an answered one, so the round-1 reach
+    rate over all logged calls is overstated. The rate on the rows above that point is the comparable one.
+    """
+    r = calls[calls["round"] == 1].reset_index(drop=True)
+    made = r["contacted"]
+    unanswered = made & ~r["result_code"].isin(REACHED)
+    last = int(unanswered[unanswered].index.max())
+    top = r.iloc[: last + 1]
+    top = top[top["contacted"]]
+    return {"rows_with_unanswered_calls_logged": last + 1, "calls_on_those_rows": len(top), "reach_rate_on_those_rows": float(top["result_code"].isin(REACHED).mean()),
+            "calls_logged_below": int(made.iloc[last + 1:].sum()), "unanswered_logged_below": int(unanswered.iloc[last + 1:].sum())}
+
+
 def result_mix(calls: pd.DataFrame) -> pd.DataFrame:
     d = calls[calls["contacted"]].copy()
     d["result_group"] = d["result_code"].map(GROUPS).fillna("other")

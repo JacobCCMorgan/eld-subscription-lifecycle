@@ -209,3 +209,14 @@ def test_call_outcomes_keep_on_hold_apart_from_left():
     # a customer with paid term left, or inside the grace period, has not left
     assert 0.25 < never["left_share"] < 0.31
     assert 0.12 < never["on_hold_share"] < 0.17
+
+
+@pytestmark_inputs
+def test_round1_reach_rate_is_measured_where_unanswered_calls_were_logged():
+    from sublife import calls
+
+    c = pd.read_parquet(INPUT / "migration_calls.parquet")
+    g = calls.round1_logging(c)
+    assert g["unanswered_logged_below"] == 0 and g["calls_logged_below"] > 100
+    overall = calls.funnel(c).set_index("round").loc[1, "reach_rate_of_contacted"]
+    assert g["reach_rate_on_those_rows"] < overall
