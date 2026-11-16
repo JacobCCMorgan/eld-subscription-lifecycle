@@ -200,7 +200,7 @@ def fig_migration(mix: pd.DataFrame, fun: pd.DataFrame, outc: pd.DataFrame, out:
     ax[2].set_yticklabels([f"{g}\n(n={int(o.loc[g, 'customers'])})" for g in order], fontsize=8)
     ax[2].invert_yaxis()
     ax[2].set_xlim(0, 1)
-    ax[2].set_title("2025 rounds: state in Sep 2026 by what the customer said")
+    ax[2].set_title("2025 rounds: state in Sep 2026 by call result")
     ax[2].legend(fontsize=8, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2)
     _save(fig, out, "07_migration_and_calls.png")
 
