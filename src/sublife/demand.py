@@ -13,19 +13,20 @@ import pandas as pd
 from .survival import DiscreteHazard
 
 
-def renewal_calendar(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp, months: int = 12) -> pd.DataFrame:
-    """Per month: active slots and customers whose term ends, with the hazard model's expected non-renewals.
+def renewal_slots(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp, months: int = 12) -> pd.DataFrame:
+    """One row per active slot whose term ends in the next `months`, with the hazard model's non-renewal probability.
 
-    Two scenarios bracket the calendar effect: the model at the most recent fitted year's level and at the
-    2025 peak level.
+    Two scenarios bracket the calendar effect: `p_recent` is the model at the most recent fitted year's
+    level, `p_peak` at the 2025 peak level.
     """
     dh = DiscreteHazard().fit(p)
     a = c[c["is_active_now"] & (c["expiration_date"] > snapshot)].merge(
         o[["org_key", "start_date", "fleet_at_start", "active_slots", "state_group", "channel", "email_is_free_domain"]], on="org_key", how="left")
-    a = a[(a["expiration_date"] <= snapshot + pd.DateOffset(months=months)) & a["start_date"].notna()]
+    a = a[(a["expiration_date"] <= snapshot + pd.DateOffset(months=months)) & a["start_date"].notna()].copy()
     ret = c[c["return_date"] > snapshot - pd.Timedelta(365, "D")].groupby("org_key").size()
+    a["k"] = ((a["expiration_date"] - a["start_date"]).dt.days / 365).round().clip(lower=1).astype(int)
     q = pd.DataFrame({
-        "org_key": a["org_key"].values, "k": ((a["expiration_date"] - a["start_date"]).dt.days / 365).round().clip(lower=1).astype(int).values,
+        "org_key": a["org_key"].values, "k": a["k"].values,
         "fleet_at_decision": a["active_slots"].values, "fleet_at_start": a["fleet_at_start"].values,
         "state_group": a["state_group"].values, "channel": a["channel"].values, "email_is_free_domain": a["email_is_free_domain"].values,
     })
@@ -35,9 +36,19 @@ def renewal_calendar(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot
     a["p_recent"] = dh.predict(q.assign(calendar_year=max(years)))
     a["p_peak"] = dh.predict(q.assign(calendar_year=2025 if 2025 in years else max(years)))
     a["month"] = a["expiration_date"].dt.to_period("M").dt.to_timestamp()
+    return a
+
+
+def calendar_from_slots(a: pd.DataFrame) -> pd.DataFrame:
+    """Per month: slots and customers whose term ends, with the expected non-renewals under both scenarios."""
     t = a.groupby("month").agg(slots_due=("org_key", "size"), customers_due=("org_key", "nunique"), expected_non_renewals_recent=("p_recent", "sum"), expected_non_renewals_peak=("p_peak", "sum")).reset_index()
     t["expected_renewals_recent"] = t["slots_due"] - t["expected_non_renewals_recent"]
     return t
+
+
+def renewal_calendar(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp, months: int = 12) -> pd.DataFrame:
+    """Per month: active slots and customers whose term ends, with the hazard model's expected non-renewals."""
+    return calendar_from_slots(renewal_slots(o, c, p, snapshot, months))
 
 
 def signings_per_month(o: pd.DataFrame, start: str = "2021-01", end: pd.Timestamp | None = None) -> pd.DataFrame:
