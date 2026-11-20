@@ -45,8 +45,8 @@ January 2024 is used to validate the reconstruction. Inputs are de-identified an
   attribute. Attributes at signing alone: Cox concordance 0.55.
 - **Next 60 days and next 12 months.** 408 customers with 1,075 subscriptions reach an anniversary by
   27 Nov 2026 (`reports/renewal_risk_list.csv`, ranked, about 150 expected non-renewals). 3,663 subscriptions
-  from 2,006 customers come up in the twelve months after the export: 640 expected non-renewals at the
-  recent-year rate, 842 at the 2025 peak rate, with a July peak of 395 expiring terms. New signings run at
+  from 2,006 customers come up in the twelve months after the export: 641 expected non-renewals at the
+  recent-year rate, 843 at the 2025 peak rate, with a July peak of 395 expiring terms. New signings run at
   33 per month; the backtested methods put the next twelve months between about 400 and 560.
 - **The hardware migration is nearly done and the calls were predictive.** 90 % of active subscriptions are
   on the 2.0 unit; 366 legacy units at 252 customers remain. Five call rounds: round 2 (1,184 calls) reached
