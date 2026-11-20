@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import analysis, calls, demand, lineage, report, survival, validate
+from . import analysis, bi, calls, demand, lineage, report, survival, validate
 from . import renewal_model as rm
 from .data import SNAPSHOT, clean_contracts, load_inputs
 from .orgs import org_periods, org_table_with_restored
@@ -115,6 +115,7 @@ def main(argv=None):
     # 5. demand
     rcal = demand.renewal_calendar(o, c, p, SNAPSHOT)
     _csv(rcal, tab / "renewal_calendar_12m.csv")
+    bi.write_extracts(o, c, p, SNAPSHOT, out / "tableau")
     sign = demand.signings_per_month(o, end=SNAPSHOT.to_period("M").to_timestamp())
     bt = demand.backtest(sign)
     fc, best = demand.forecast(sign, bt)
