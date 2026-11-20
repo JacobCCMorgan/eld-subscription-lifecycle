@@ -43,6 +43,8 @@ def calendar_from_slots(a: pd.DataFrame) -> pd.DataFrame:
     """Per month: slots and customers whose term ends, with the expected non-renewals under both scenarios."""
     t = a.groupby("month").agg(slots_due=("org_key", "size"), customers_due=("org_key", "nunique"), expected_non_renewals_recent=("p_recent", "sum"), expected_non_renewals_peak=("p_peak", "sum")).reset_index()
     t["expected_renewals_recent"] = t["slots_due"] - t["expected_non_renewals_recent"]
+    # a customer with terms ending in different months is in several rows, so the monthly counts do not add up to customers
+    t.attrs["customers"] = int(a["org_key"].nunique())
     return t
 
 

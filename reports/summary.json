@@ -118,8 +118,8 @@
     "expected_churn_slots": 149.6683
   },
   "renewal_calendar_12m": {
+    "customers": 2006,
     "slots_due": 3663.0,
-    "customers_due": 2928.0,
     "expected_non_renewals_recent": 640.945933,
     "expected_non_renewals_peak": 842.888514
   },

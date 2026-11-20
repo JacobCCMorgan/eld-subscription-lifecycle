@@ -152,6 +152,15 @@ def test_forecast_methods_and_backtest():
     assert np.allclose(demand._seasonal_naive(np.arange(24.0), 3), [12, 13, 14])
 
 
+def test_calendar_counts_each_customer_once():
+    # X has terms ending in two different months, Y in one: three customer-months, two customers
+    a = pd.DataFrame({"org_key": ["ORG-X", "ORG-X", "ORG-Y"], "month": [T("2027-01-01"), T("2027-03-01"), T("2027-01-01")], "p_recent": [0.2, 0.2, 0.1], "p_peak": [0.3, 0.3, 0.2]})
+    cal = demand.calendar_from_slots(a)
+    assert cal["slots_due"].tolist() == [2, 1] and cal["customers_due"].tolist() == [2, 1]
+    assert cal["customers_due"].sum() == 3 and cal.attrs["customers"] == 2
+    assert np.isclose(cal["expected_non_renewals_recent"].sum(), 0.5)
+
+
 def test_device_level_validation_on_toy():
     cur = pd.DataFrame({"device_key": ["DEV-1", "DEV-2", "DEV-3"], "activation_date": [T("2025-01-01"), T("2024-01-01"), T("2024-06-15")], "contract_date": [T("2023-01-01")] * 3, "status": ["active"] * 3, "is_internal_test": False})
     snap = pd.DataFrame({"device_key": ["DEV-1", "DEV-2", "DEV-3"], "activation_date": [T("2024-01-01"), T("2024-01-01"), T("2024-01-01")], "contract_date": [T("2023-01-01")] * 3, "is_internal_test": False})

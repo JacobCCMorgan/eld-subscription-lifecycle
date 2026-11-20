@@ -172,7 +172,7 @@ def main(argv=None):
     summary.update({"validation": vsum, "device_validation": dev, "k_rates_2024_2026": k_rates, "churn_by_year": by_year.set_index("calendar_year")["churn_rate"].to_dict(),
                     "cox": cox_meta, "hazard_odds": odds.set_index("covariate")["odds_ratio"].round(3).to_dict(), "model_metrics": met.set_index("model")[["roc_auc", "pr_auc", "brier", "recall_top20"]].round(3).to_dict(orient="index"),
                     "hazard_holdout_2026": hold, "risk_list": {"customers": int(len(rl)), "slots": int(rl["active_slots"].sum()), "expected_churn_slots": float(rl["expected_churn_slots"].sum())},
-                    "renewal_calendar_12m": rcal[["slots_due", "customers_due", "expected_non_renewals_recent", "expected_non_renewals_peak"]].sum().to_dict(),
+                    "renewal_calendar_12m": {"customers": rcal.attrs["customers"], **rcal[["slots_due", "expected_non_renewals_recent", "expected_non_renewals_peak"]].sum().to_dict()},
                     "signings": {"method": best, "next_12m": float(fc["forecast"].sum()), "lo": float(fc["lo"].sum()), "hi": float(fc["hi"].sum())},
                     "generation_mix_2026": mix.set_index("generation")["share_2026_09"].round(3).to_dict(), "transitions": tmeta,
                     "calls": {"funnel": fun.to_dict(orient="records"), "round1_logging": calls.round1_logging(inp["migration_calls"]), "outcomes_2025": outc[["result_in_2025", "customers", "migrated_share", "left_share", "on_hold_share"]].round(3).to_dict(orient="records")}})
