@@ -80,15 +80,22 @@ Full write-up with figures: [`reports/subscription_lifecycle_report.md`](reports
 6. **Demand, hardware, calls** (`demand.py`, `lineage.py`, `calls.py`): renewal calendar with expected
    non-renewals under two rate scenarios, backtested signings forecast with a parsimony rule, generation mix
    and resolvable transitions, call funnel and outcomes by what the customer said.
+7. **Dashboard extracts** (`bi.py`): three flat files for a BI tool, one row per customer, per anniversary
+   reached and per subscription due, relating on the customer key. Codes are relabelled, nothing is modelled
+   again, and risk tiers use the two probability cut points of the 60-day list. The tests hold the extracts to
+   the risk list, the renewal calendar and the report rates. Columns:
+   [`reports/tableau/FIELDS.md`](reports/tableau/FIELDS.md).
 
 ## Repository layout
 
 ```
 data/input/             de-identified inputs (contracts, 2024 export, call rounds) and SOURCE.md
 scripts/prepare_inputs.py   how the inputs were produced (needs the raw workbooks and the key; not runnable publicly)
-src/sublife/            data, orgs, validate, survival, renewal_model, demand, lineage, calls, report, run, cli
+src/sublife/            data, orgs, validate, survival, renewal_model, demand, lineage, calls, bi, report, run, cli
 reports/                generated: report, 7 figures, renewal_risk_list.csv, 27 tables, summary.json
-tests/                  toy contract rows through the whole chain, hazard fit, forecast, input invariants
+reports/tableau/        generated: customers.csv, anniversaries.csv, subscriptions_due.csv, FIELDS.md
+tests/                  toy contract rows through the whole chain, hazard fit, forecast, input invariants,
+                        dashboard extracts against the report
 ```
 
 ## Reproduce
@@ -98,8 +105,8 @@ git clone https://github.com/JacobCCMorgan/eld-subscription-lifecycle.git
 cd eld-subscription-lifecycle
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                     # about 3 s
-sublife --out reports         # tables, figures, risk list, report; about 25 s
+pytest -q                     # about 10 s
+sublife --out reports         # tables, figures, risk list, extracts, report; about 25 s
 ```
 
 ## Limitations
