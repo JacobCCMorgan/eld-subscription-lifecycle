@@ -10,6 +10,9 @@ customers.csv           one row per customer organization
 anniversaries.csv       one row per customer x anniversary reached
 subscriptions_due.csv   one row per active subscription whose term ends in the next twelve months
 
+Apart from the key, no column name is used in more than one file, so a tool that relates the three
+does not have to disambiguate them.
+
 Risk tiers use the two probability cut points of the published 60-day list (its median and its 80th
 percentile), applied to every account, so an account keeps its tier whatever window a dashboard shows.
 """
@@ -43,6 +46,7 @@ FIELDS = {
         "vehicles_at_signing": "Subscriptions sold within 30 days of the first contract",
         "fleet_size_at_signing": "vehicles_at_signing in four bands",
         "active_subscriptions": "Subscriptions active on the export date",
+        "subscriptions_due_next_year": "Active subscriptions whose term ends in the twelve months after the export (the rows of subscriptions_due.csv)",
         "legacy_units_active": "Active subscriptions still on pre-2.0 hardware",
         "device_returns": "Subscriptions with a device return on record, all years",
         "state_group": "California, Other states or Unknown",
@@ -71,11 +75,11 @@ FIELDS = {
         "returned_device_in_term": "Yes when a device came back during the term, before decision_date",
     },
     "subscriptions_due.csv": {
-        "due_id": "Row number, ordered by expiration date",
+        "due_id": "Row number, ordered by due date",
         "org_key": "Customer pseudonym",
-        "expiration_date": "End of the current term of this subscription",
-        "days_to_expiration": "Days from the export date to expiration_date",
-        "anniversary": "Which anniversary of the customer the expiration is",
+        "due_date": "End of the current term of this subscription",
+        "days_until_due": "Days from the export date to due_date",
+        "anniversary_due": "Which anniversary of the customer that date is",
         "p_non_renewal_recent": "Hazard model probability of non-renewal at the most recent year's level",
         "p_non_renewal_peak": "The same at the 2025 peak level",
     },
@@ -93,14 +97,15 @@ def tier_edges(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.T
     return float(lo), float(hi)
 
 
-def customers(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp) -> pd.DataFrame:
+def customers(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp, due: pd.DataFrame | None = None) -> pd.DataFrame:
     lo, hi = tier_edges(o, c, p, snapshot)
+    due = subscriptions_due(o, c, p, snapshot) if due is None else due
     scored = rm.risk_list(o, c, p, snapshot, horizon_days=36500).set_index("org_key")  # every account with a term still to end
     active = o["active_slots"] > 0
     t = pd.DataFrame({
         "org_key": o["org_key"], "customer_since": o["start_date"], "cohort_year": o["start_year"], "lifecycle": o["lifecycle"].map(LIFECYCLE), "churned": o["churned"].astype(int),
         "exit_mode": o["exit_mode"].map(EXIT_MODE), "tenure_days": o["tenure_days"], "vehicles_at_signing": o["fleet_at_start"], "fleet_size_at_signing": o["fleet_band"].map(FLEET_BAND),
-        "active_subscriptions": o["active_slots"], "legacy_units_active": o["legacy_slots_active"], "device_returns": o["n_returns"], "state_group": o["state_group"].map(STATE_GROUP),
+        "active_subscriptions": o["active_slots"], "subscriptions_due_next_year": o["org_key"].map(due.groupby("org_key").size()).fillna(0).astype(int), "legacy_units_active": o["legacy_slots_active"], "device_returns": o["n_returns"], "state_group": o["state_group"].map(STATE_GROUP),
         "channel": o["channel"].map(CHANNEL), "record_source": o["source"].map(SOURCE), "next_expiration": o["next_expiration"].where(active),
     })
     t["days_to_expiration"] = (t["next_expiration"] - snapshot).dt.days.astype("Int64")
@@ -126,16 +131,17 @@ def anniversaries(p: pd.DataFrame) -> pd.DataFrame:
 def subscriptions_due(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp, months: int = 12) -> pd.DataFrame:
     a = demand.renewal_slots(o, c, p, snapshot, months)
     t = pd.DataFrame({
-        "org_key": a["org_key"].values, "expiration_date": a["expiration_date"].values, "days_to_expiration": (a["expiration_date"] - snapshot).dt.days.values, "anniversary": a["k"].values,
+        "org_key": a["org_key"].values, "due_date": a["expiration_date"].values, "days_until_due": (a["expiration_date"] - snapshot).dt.days.values, "anniversary_due": a["k"].values,
         "p_non_renewal_recent": a["p_recent"].round(4).values, "p_non_renewal_peak": a["p_peak"].round(4).values, "_row": a["contract_row_id"].values,
     })
-    t = t.sort_values(["expiration_date", "org_key", "_row"]).drop(columns="_row").reset_index(drop=True)
+    t = t.sort_values(["due_date", "org_key", "_row"]).drop(columns="_row").reset_index(drop=True)
     t.insert(0, "due_id", np.arange(1, len(t) + 1))
     return t[list(FIELDS["subscriptions_due.csv"])]
 
 
 def extracts(o: pd.DataFrame, c: pd.DataFrame, p: pd.DataFrame, snapshot: pd.Timestamp) -> dict[str, pd.DataFrame]:
-    return {"customers.csv": customers(o, c, p, snapshot), "anniversaries.csv": anniversaries(p), "subscriptions_due.csv": subscriptions_due(o, c, p, snapshot)}
+    due = subscriptions_due(o, c, p, snapshot)
+    return {"customers.csv": customers(o, c, p, snapshot, due), "anniversaries.csv": anniversaries(p), "subscriptions_due.csv": due}
 
 
 def fields_markdown(tables: dict[str, pd.DataFrame], snapshot: pd.Timestamp, edges: tuple[float, float]) -> str:

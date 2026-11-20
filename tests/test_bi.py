@@ -54,7 +54,9 @@ def test_extracts_relate_on_org_key(real):
         assert list(t.columns) == list(bi.FIELDS[name])
     assert cu["org_key"].is_unique and len(cu) == len(o)
     assert not an.duplicated(["org_key", "anniversary"]).any() and len(an) == len(p)
-    assert du["due_id"].tolist() == list(range(1, len(du) + 1)) and du["expiration_date"].is_monotonic_increasing
+    assert du["due_id"].tolist() == list(range(1, len(du) + 1)) and du["due_date"].is_monotonic_increasing
+    shared = [set(a.columns) & set(b.columns) for a, b in ((cu, an), (cu, du), (an, du))]
+    assert all(s == {"org_key"} for s in shared)  # only the key repeats across the three files
     assert an["org_key"].isin(cu["org_key"]).all() and du["org_key"].isin(cu["org_key"]).all()
     assert cu["lifecycle"].notna().all() and cu["state_group"].notna().all() and cu["channel"].notna().all() and cu["fleet_size_at_signing"].notna().all()
     assert not {"state", "sales_rep_key", "first_make"} & set(cu.columns)  # segments only at the level the report publishes
@@ -84,12 +86,15 @@ def test_due_rows_add_up_to_the_renewal_calendar(real):
     du = x["subscriptions_due.csv"]
     cal = demand.renewal_calendar(o, c, p, SNAPSHOT)
     assert len(du) == cal["slots_due"].sum() and du["org_key"].nunique() == cal.attrs["customers"]
-    month = du["expiration_date"].dt.to_period("M").dt.to_timestamp()
+    month = du["due_date"].dt.to_period("M").dt.to_timestamp()
     g = du.groupby(month).agg(n=("due_id", "size"), recent=("p_non_renewal_recent", "sum"), peak=("p_non_renewal_peak", "sum"))
     assert (g["n"].values == cal["slots_due"].values).all()
     assert np.allclose(g["recent"].values, cal["expected_non_renewals_recent"].values, atol=0.02) and np.allclose(g["peak"].values, cal["expected_non_renewals_peak"].values, atol=0.02)
     assert (du["p_non_renewal_peak"] >= du["p_non_renewal_recent"]).all()  # the two scenarios differ by the year level only, and 2025 is the higher one
-    assert du["days_to_expiration"].between(1, 366).all()
+    assert du["days_until_due"].between(1, 366).all()
+    cu = x["customers.csv"]
+    assert cu["subscriptions_due_next_year"].sum() == len(du) and (cu["subscriptions_due_next_year"] > 0).sum() == cal.attrs["customers"]
+    assert (cu["subscriptions_due_next_year"] <= cu["active_subscriptions"]).all()
 
 
 @needs_inputs

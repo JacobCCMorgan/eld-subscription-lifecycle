@@ -17,6 +17,7 @@ Risk tier cut points: A at or above 0.2812, B at or above 0.2119, C below.
 | `vehicles_at_signing` | Subscriptions sold within 30 days of the first contract |
 | `fleet_size_at_signing` | vehicles_at_signing in four bands |
 | `active_subscriptions` | Subscriptions active on the export date |
+| `subscriptions_due_next_year` | Active subscriptions whose term ends in the twelve months after the export (the rows of subscriptions_due.csv) |
 | `legacy_units_active` | Active subscriptions still on pre-2.0 hardware |
 | `device_returns` | Subscriptions with a device return on record, all years |
 | `state_group` | California, Other states or Unknown |
@@ -51,10 +52,10 @@ Risk tier cut points: A at or above 0.2812, B at or above 0.2119, C below.
 
 | column | meaning |
 |---|---|
-| `due_id` | Row number, ordered by expiration date |
+| `due_id` | Row number, ordered by due date |
 | `org_key` | Customer pseudonym |
-| `expiration_date` | End of the current term of this subscription |
-| `days_to_expiration` | Days from the export date to expiration_date |
-| `anniversary` | Which anniversary of the customer the expiration is |
+| `due_date` | End of the current term of this subscription |
+| `days_until_due` | Days from the export date to due_date |
+| `anniversary_due` | Which anniversary of the customer that date is |
 | `p_non_renewal_recent` | Hazard model probability of non-renewal at the most recent year's level |
 | `p_non_renewal_peak` | The same at the 2025 peak level |
